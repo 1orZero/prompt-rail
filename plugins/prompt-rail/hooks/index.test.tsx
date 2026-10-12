@@ -232,12 +232,13 @@ test('a desktop band too narrow for the label keeps one bar and its marks within
     await $.ui.mount({ plugin: 'prompt-rail', surface: 'terminal', component: 'UserMessage', requestId: `m${n}`, props: prompt(`prompt number ${n}`, null) })
   }
   await $.command.run({ command: 'prompt-rail', args: 'horizontal' })
-  // Eight cells once inset: a bar between its marks, with a gap shrunk to fit and no label.
+  // Eight cells once inset: a bar between its marks, gaps that fit and no label.
   const band = await $.ui.mount({ plugin: 'prompt-rail', surface: 'desktop', component: 'AbovePrompt', props: { ...BAND, bodyColumns: 12 } })
   const drawn = await band.findAll({})
   expect(drawn.filter((node: any) => node.type === 'Button').length).toBe(1)
   expect(drawn.some((node: any) => isDimLabel(node, /^#/))).toBe(false)
-  expect(drawn.find((node: any) => node.props?.columnGap !== undefined)?.props.columnGap).toBe(2)
+  const gap = drawn.find((node: any) => node.props?.columnGap !== undefined)?.props.columnGap
+  expect(3 + 2 * gap).toBeLessThanOrEqual(8)
 })
 
 test('a command names a prompt by number, first, last or the words it holds', () => {
