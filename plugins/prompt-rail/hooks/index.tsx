@@ -54,7 +54,7 @@ const LATELY_MS = 250
 // leaving the first bar crosses a cell and the surface sees the hover end.
 const RAIL_INSET = 2
 // Cells between horizontal bars, so a tap on a phone lands on one bar.
-export const BAR_GAP = 5
+export const BAR_GAP = 2
 // The engine's refusal when no row is drawn under an id, as for a slash
 // command's own row, which the transcript file holds but the surface skips.
 // Other refusals (a race with another move) pass, so they leave the tick be.
