@@ -1,5 +1,5 @@
 import { test, expect, mock } from 'claude-code/testing'
-import { bar, drawnRow, jumpNotice, noteScroll, pickPrompt, rowKey, stepFrom, tick, turnLine } from './index.tsx'
+import { PAGE_BAR_GAP, bar, drawnRow, jumpNotice, noteScroll, pickPrompt, rowKey, stepFrom, tick, turnLine } from './index.tsx'
 
 const SURFACES = ['terminal', 'desktop'] as const
 
@@ -219,8 +219,9 @@ test('on the desktop the bars leave room beside them for the prompt being read',
   const marks = drawn.filter((node: any) => node.type === 'Text' && (node.text === '‹' || node.text === '›' || node.text === ' ')).length
   const label = drawn.find((node: any) => isDimLabel(node, /^#2 /))
   expect(label).toBeDefined()
-  // The bars, their marks, a gap and the label fit the band's width, inset aside.
-  expect(bars + marks + 1 + [...String(label.text)].length).toBeLessThanOrEqual(bodyColumns - 2 - 2)
+  // The bars, their marks, the gaps between them, a gap and the label fit the band's width, inset aside.
+  const slots = bars + marks
+  expect(slots + (slots - 1) * PAGE_BAR_GAP + 1 + [...String(label.text)].length).toBeLessThanOrEqual(bodyColumns - 2 - 2)
   expect(String(label.text)).toMatch(/^#2 second/)
 })
 

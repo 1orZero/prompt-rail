@@ -53,6 +53,8 @@ const LATELY_MS = 250
 // Cells kept left of the horizontal rail: off the window's edge, a pointer
 // leaving the first bar crosses a cell and the surface sees the hover end.
 const RAIL_INSET = 2
+// Cells between horizontal bars on a page (desktop, mobile), so a tap lands on one bar.
+export const PAGE_BAR_GAP = 2
 // The engine's refusal when no row is drawn under an id, as for a slash
 // command's own row, which the transcript file holds but the surface skips.
 // Other refusals (a race with another move) pass, so they leave the tick be.
@@ -1390,7 +1392,10 @@ export const register: Register = (on, options) => {
       const shownRing = isCellGrid && ringed !== undefined && ringed < entries.length ? ringed : undefined
       // Cells for the bars and their marks: the whole line, or beside the
       // label of the prompt being read, a gap and a few words of it.
-      const barCells = isCellGrid ? width : Math.max(MIN_DESKTOP_BARS, width - 1 - MIN_CARD_TEXT)
+      const gap = isCellGrid ? 0 : PAGE_BAR_GAP
+      const barCells = isCellGrid
+        ? width
+        : Math.max(MIN_DESKTOP_BARS, Math.floor((width - 1 - MIN_CARD_TEXT + gap) / (gap + 1)))
       // More prompts than cells: a window of bars centered on the prompt being
       // read (the newest when none is known), `‹` and `›` marking what it hides.
       // It stays put while the ring moves: the ring keeps its place in the row,
@@ -1426,8 +1431,9 @@ export const register: Register = (on, options) => {
         hidesAfter ? <Text dimColor>›</Text> : null,
       ]
       if (!isCellGrid) {
-        // Each bar and mark a cell wide, then a gap.
-        const room = width - (isOverflowing ? barCells : entries.length) - 1
+        // Each bar and mark a cell wide with `gap` cells between, then a gap.
+        const slots = isOverflowing ? barCells : entries.length
+        const room = width - (slots + (slots - 1) * gap) - 1
         return (
           <Box flexDirection="column" paddingLeft={RAIL_INSET}>
             <Box height={1} width={width}>
@@ -1438,7 +1444,9 @@ export const register: Register = (on, options) => {
               ))}
             </Box>
             <Box flexDirection="row">
-              {bars}
+              <Box flexDirection="row" columnGap={gap}>
+                {bars}
+              </Box>
               {/* With no prompt known on screen, the newest: bars alone read as a broken rail. */}
               <Box marginLeft={1}>
                 <Text dimColor wrap="truncate-end">{label(center, room)}</Text>
