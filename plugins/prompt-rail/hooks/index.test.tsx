@@ -225,6 +225,21 @@ test('on the desktop the bars leave room beside them for the prompt being read',
   expect(String(label.text)).toMatch(/^#2 second/)
 })
 
+test('a desktop band too narrow for the label keeps one bar and its marks within its width', async ($, on) => {
+  mock.clock(on)
+  await drawPrompts($, on)
+  for (let n = 3; n <= 25; n++) {
+    await $.ui.mount({ plugin: 'prompt-rail', surface: 'terminal', component: 'UserMessage', requestId: `m${n}`, props: prompt(`prompt number ${n}`, null) })
+  }
+  await $.command.run({ command: 'prompt-rail', args: 'horizontal' })
+  // Eight cells once inset: a bar between its marks, with a gap shrunk to fit and no label.
+  const band = await $.ui.mount({ plugin: 'prompt-rail', surface: 'desktop', component: 'AbovePrompt', props: { ...BAND, bodyColumns: 12 } })
+  const drawn = await band.findAll({})
+  expect(drawn.filter((node: any) => node.type === 'Button').length).toBe(1)
+  expect(drawn.some((node: any) => isDimLabel(node, /^#/))).toBe(false)
+  expect(drawn.find((node: any) => node.props?.columnGap !== undefined)?.props.columnGap).toBe(2)
+})
+
 test('a command names a prompt by number, first, last or the words it holds', () => {
   const texts = ['fix the build', 'add tests', 'Fix the docs']
   expect([pickPrompt('2', texts), pickPrompt('#3', texts), pickPrompt('4', texts), pickPrompt('0', texts)]).toEqual([1, 2, -1, -1])

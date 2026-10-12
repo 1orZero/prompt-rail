@@ -54,7 +54,7 @@ const LATELY_MS = 250
 // leaving the first bar crosses a cell and the surface sees the hover end.
 const RAIL_INSET = 2
 // Cells between horizontal bars on a page (desktop, mobile), so a tap lands on one bar.
-export const PAGE_BAR_GAP = 2
+export const PAGE_BAR_GAP = 5
 // The engine's refusal when no row is drawn under an id, as for a slash
 // command's own row, which the transcript file holds but the surface skips.
 // Other refusals (a race with another move) pass, so they leave the tick be.
@@ -1392,7 +1392,8 @@ export const register: Register = (on, options) => {
       const shownRing = isCellGrid && ringed !== undefined && ringed < entries.length ? ringed : undefined
       // Cells for the bars and their marks: the whole line, or beside the
       // label of the prompt being read, a gap and a few words of it.
-      const gap = isCellGrid ? 0 : PAGE_BAR_GAP
+      // A band too narrow for one bar and its marks at the full gap takes a smaller one.
+      const gap = isCellGrid ? 0 : Math.min(PAGE_BAR_GAP, Math.floor((width - MIN_DESKTOP_BARS) / (MIN_DESKTOP_BARS - 1)))
       const barCells = isCellGrid
         ? width
         : Math.max(MIN_DESKTOP_BARS, Math.floor((width - 1 - MIN_CARD_TEXT + gap) / (gap + 1)))
@@ -1434,6 +1435,7 @@ export const register: Register = (on, options) => {
         // Each bar and mark a cell wide with `gap` cells between, then a gap.
         const slots = isOverflowing ? barCells : entries.length
         const room = width - (slots + (slots - 1) * gap) - 1
+        const reading = label(center, room)
         return (
           <Box flexDirection="column" paddingLeft={RAIL_INSET}>
             <Box height={1} width={width}>
@@ -1447,10 +1449,13 @@ export const register: Register = (on, options) => {
               <Box flexDirection="row" columnGap={gap}>
                 {bars}
               </Box>
-              {/* With no prompt known on screen, the newest: bars alone read as a broken rail. */}
-              <Box marginLeft={1}>
-                <Text dimColor wrap="truncate-end">{label(center, room)}</Text>
-              </Box>
+              {/* With no prompt known on screen, the newest: bars alone read as a broken rail.
+                  A band with no room for its number and a word leaves it out rather than run past its width. */}
+              {cellWidth(reading) <= room ? (
+                <Box marginLeft={1}>
+                  <Text dimColor wrap="truncate-end">{reading}</Text>
+                </Box>
+              ) : null}
             </Box>
           </Box>
         )
