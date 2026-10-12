@@ -1,5 +1,5 @@
 import { test, expect, mock } from 'claude-code/testing'
-import { PAGE_BAR_GAP, bar, drawnRow, jumpNotice, noteScroll, pickPrompt, rowKey, stepFrom, tick, turnLine } from './index.tsx'
+import { BAR_GAP, bar, drawnRow, jumpNotice, noteScroll, pickPrompt, rowKey, stepFrom, tick, turnLine } from './index.tsx'
 
 const SURFACES = ['terminal', 'desktop'] as const
 
@@ -221,7 +221,7 @@ test('on the desktop the bars leave room beside them for the prompt being read',
   expect(label).toBeDefined()
   // The bars, their marks, the gaps between them, a gap and the label fit the band's width, inset aside.
   const slots = bars + marks
-  expect(slots + (slots - 1) * PAGE_BAR_GAP + 1 + [...String(label.text)].length).toBeLessThanOrEqual(bodyColumns - 2 - 2)
+  expect(slots + (slots - 1) * BAR_GAP + 1 + [...String(label.text)].length).toBeLessThanOrEqual(bodyColumns - 2 - 2)
   expect(String(label.text)).toMatch(/^#2 second/)
 })
 
@@ -939,8 +939,8 @@ test("while a subagent's transcript is in view the band stays empty", async ($, 
   expect(await band.findAll({ type: 'Button' })).toEqual([])
 })
 
-// Twelve prompts, the one at `reading` on screen, in a horizontal band ten
-// cells wide: eight bars fit between the two elision marks.
+// Twelve prompts, the one at `reading` on screen, in a horizontal band with
+// ten slots: eight bars fit between the two elision marks, `BAR_GAP` apart.
 const overflowBand = async ($: any, on: any, reading: number) => {
   world(on)
   await $.session.start({ cwd: '/t', surface: 'terminal', isInteractive: true })
@@ -949,16 +949,18 @@ const overflowBand = async ($: any, on: any, reading: number) => {
     const onScreen = i === reading ? { first: 0, last: 1, of: 2 } : null
     await $.ui.mount({ plugin: 'prompt-rail', surface: 'terminal', component: 'UserMessage', requestId: `p${i}`, props: prompt(`prompt ${i}`, onScreen) })
   }
-  const band = await $.ui.mount({ plugin: 'prompt-rail', surface: 'terminal', component: 'AbovePrompt', props: { ...BAND, bodyColumns: 14 } })
+  const band = await $.ui.mount({ plugin: 'prompt-rail', surface: 'terminal', component: 'AbovePrompt', props: { ...BAND, bodyColumns: 10 + 9 * BAR_GAP + 4 } })
   const lower = (await band.findAll({ type: 'Button' })).map((b: any) => String(b.props.key)).filter((key: string) => /^jump-\d+$/.test(key))
   const marks = (await band.findAll({ type: 'Text' })).map((t: any) => t.text).filter((text: string) => text === '‹' || text === '›')
-  return { lower, marks }
+  const gap = (await band.findAll({})).find((node: any) => node.props?.columnGap !== undefined)?.props.columnGap
+  return { lower, marks, gap }
 }
 
 test('an overflowing horizontal rail keeps the prompt being read near the start', async ($, on) => {
-  const { lower, marks } = await overflowBand($, on, 2)
+  const { lower, marks, gap } = await overflowBand($, on, 2)
   expect(lower).toEqual(['jump-0', 'jump-1', 'jump-2', 'jump-3', 'jump-4', 'jump-5', 'jump-6', 'jump-7'])
   expect(marks).toEqual(['›'])
+  expect(gap).toBe(BAR_GAP)
 })
 
 test('an overflowing horizontal rail centers the prompt being read', async ($, on) => {
