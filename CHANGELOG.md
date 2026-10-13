@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.8.0-fork.1
+
+- Replaced the horizontal and vertical layouts with one modeled on the oh-my-pi prompt rail: the latest prompt on a row above the prompt input, tinted like your prompts in the transcript
+- Added keyboard browsing: with `meta+j` bound to `abovePrompt:focus`, alt+j lists the newest four prompts in a frame, `j` and `k` move between them and scroll the transcript, and `q` or Escape (bound to `command:prompt-rail-back`) returns to the prompt
+- Changed the mode setting to `on` or `off`; bare `/prompt-rail` toggles it
+- Removed `/prompt-rail next` and `prev`, `/prompt-rail-next`, `/prompt-rail-prev`, the hover cards and their turn details
+- Fixed prompts queued while a turn runs being listed twice once Claude Code 2.1.296 sent them, together or alone
+
 ## 0.7.1
 
 - Fixed the horizontal rail in the Claude desktop app drawing a hovered prompt's card over the dim line of the prompt being read, so both texts showed at once; there the line above the bars now shows the hovered card alone, and the prompt being read is named beside the bars, with room kept for it however many bars there are

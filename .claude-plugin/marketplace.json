@@ -6,7 +6,7 @@
     {
       "name": "prompt-rail",
       "source": "./plugins/prompt-rail",
-      "description": "A rail of your session's prompts beside the transcript or above the prompt; hover to read one, click to jump to it.",
+      "description": "The latest prompt of your session above the prompt; alt+j browses them by keyboard and jumps the transcript to each.",
       "homepage": "https://github.com/oikon48/prompt-rail",
       "repository": "https://github.com/oikon48/prompt-rail"
     }

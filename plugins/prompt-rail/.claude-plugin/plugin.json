@@ -1,7 +1,7 @@
 {
   "name": "prompt-rail",
-  "version": "0.7.2-fork.4",
-  "description": "A rail of your session's prompts beside the transcript or above the prompt; hover to read one, click to jump to it.",
+  "version": "0.8.0-fork.1",
+  "description": "The latest prompt of your session above the prompt; alt+j browses them by keyboard and jumps the transcript to each.",
   "author": {
     "name": "oikon48"
   },
@@ -18,13 +18,12 @@
   "userConfig": {
     "mode": {
       "type": "string",
-      "title": "Rail mode",
-      "description": "off: no rail. vertical: a pane beside the transcript, one row per prompt. horizontal: a row of bars above the prompt input (terminal only). /prompt-rail off|vertical|horizontal changes it too.",
-      "default": "horizontal",
+      "title": "Prompt rail",
+      "description": "on: the latest prompt on a row above the prompt input. off: no rail. /prompt-rail on|off changes it too.",
+      "default": "on",
       "options": [
-        "off",
-        "vertical",
-        "horizontal"
+        "on",
+        "off"
       ]
     }
   }
